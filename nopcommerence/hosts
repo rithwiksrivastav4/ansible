@@ -1,0 +1,14 @@
+[app]
+172.31.7.52
+
+[db]
+localhost
+
+[app:vars]
+---
+packages:
+  - dotnet-sdk-8.0
+  - unzip
+user: nop
+home_dir: /var/lib/nopCommerce
+nop_zip_url: https://github.com/nopSolutions/nopCommerce/releases/download/release-4.70.5/nopCommerce_4.70.5_NoSource_linux_x64.zip

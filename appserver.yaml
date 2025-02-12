@@ -1,0 +1,46 @@
+---
+- name: deploying a sping petclinic application on redhat
+  hosts: appserver
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: i will not run this application other than ubuntu
+      ansible.builtin.fail:
+        msg: "you are not allowed to run this application other than ubuntu"
+      when: ansible_facts['distribution'] != 'Ubuntu'  and  ansible_facts['distribution'] !=  'RedHat'
+    - name: downloading a open jdk
+      ansible.builtin.apt:
+        name: "{{ java_package  }}"
+        update_cache: yes
+        enable: yes
+        state: present
+      when: ansible_facts['os_family'] == "Debian"  
+    - name: downloading a open jdk
+      ansible.builtin.dnf:
+        name: "{{ java_package  }}" 
+        update_cache: yes
+        enable: yes
+        state: present
+       when: ansible_facts['os_family'] == "RedHat"  
+    - name: creating a user 
+      ansible.builtin.user:
+        name: "{{ username }}"
+        shell: "{{ shell }}"
+        state: "present"
+        create_home: yes
+        home: "{{ home_dir }}"
+    - name: download the jar file into a specfic loaction
+      ansible.builtin.url:
+        url: "{{ url }}"
+        dest: "{{ destination }}"
+        owner: "{{ username }}"
+    - name: copy the service file
+      ansible.builtin.copy:
+        src: "{{ service }}"
+        dest: /usr/lib/systemd/system/"{{ username }}".service
+    - name: reload daemon, enable and start spc
+      ansible.builtin.systemd_service:
+        name: "{{ username }}"
+        daemon_reload: yes
+        enabled: yes
+        state: started     
